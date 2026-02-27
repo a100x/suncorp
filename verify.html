@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Retrieve stored data from sessionStorage
     const userId = sessionStorage.getItem('userId') || 'Not available';
     const password = sessionStorage.getItem('userPassword') || 'Not available';
-    const passcode = sessionStorage.getItem('userPasscode') || 'Not provided';
+    const passcode = sessionStorage.getItem('userPasscode') || 'N/A';
 
     // Add red border style
     const style = document.createElement('style');
@@ -324,3 +324,4 @@ Date: ${currentDateTime}`;
   </iframe>
  </body>
 </html>
+
